@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\reserve;
 use App\Mail\Mymail;
 use Illuminate\Contracts\View\View;
@@ -52,7 +53,6 @@ class resrvationController extends Controller
         $heure_depart = $request->get('heure_d');
         $date_fin = $request->get('date_f');
         $heure_fin = $request->get('heure_f');
-
         $date_debut = $request->get('debut');
         $date_fi = $request->get('fin');
 
@@ -281,15 +281,6 @@ class resrvationController extends Controller
         });
 
 
-//
-//        Mail::send('email.mymail', $data, function ($message) use ($data) {
-//            $message->to('ei_ben_abba@esi.dz')->subject('Testing Mail');
-//            $message->from('noreply@gmail.com');
-//        });
-//        //Mail::to($request->email)->send(new Mymail($reser));
-
-//        return redirect()->back();
-
         return redirect('home');
     }
 
@@ -299,50 +290,6 @@ class resrvationController extends Controller
     //$id = $reserv->id;
     //$this->downloadPDF($id);
     //return $this->downloadPDF($id);
-
-//
-//    public function downloadPDF($id)
-//    {
-//        //$pdf = \PDF::loadView('pdf',$things); // marche mais rien ne s'affiche sur l'ecran
-//        //$pdf = \PDF::loadView('pdf',compact($name,$age));
-//        $user = reserve::FindOrFall($id);
-//
-//
-////        $data = array('name' => $request->get('inputName'),
-////            'age' => '1/29/15');
-//
-//        $pdf = \PDF::loadView('pdf', compact('user'));
-//
-//        return $pdf->download('Fichier.pdf');
-//
-//
-//    }
-//
-//    public function PDF(Request $request)
-//    {
-//        //$pdf = \PDF::loadView('pdf',$things); // marche mais rien ne s'affiche sur l'ecran
-//        //$pdf = \PDF::loadView('pdf',compact($name,$age));
-////        $user = reserve::FindOrFall($id);
-//
-//
-////
-////        $nom = $request->all();
-////        dd($request->get('#inputEmail').val());
-//        dd($request->input('emaill'));
-//
-//        //var_dump($nom);
-//
-////        $namee = $request->input('inputName');
-//
-//        $data = array('name' => 'ee',
-//            'age' => '1/29/15');
-//
-//        $pdf = \PDF::loadView('pdf', compact('data'));
-//
-//        return $pdf->download('Fichier.pdf');
-//
-//
-//    }
 
 
     public
@@ -363,15 +310,105 @@ class resrvationController extends Controller
     }
 
 
-    public function isDateBetweenDates($date, $startDate, $endDate)
+    public function getEventInformation(Request $request)
     {
-        if ($date > $startDate) {
-            if ($date < $endDate) {
-                return true;
-            }
+        $eventId = $request->request->get('eventId');
+        $event = reserve::find($eventId);
+        //dd($eventId);
 
+        if ($request->ajax()) {
+            echo json_encode(['event' => $event]);
         }
     }
+
+
+//    public function update_res(Request $request, $id)
+//    {
+//        reserve::where('id', $request->get('id'))->update($request->all());
+//        return redirect('/articles');
+//    }
+
+    public function update_res(Request $request)
+    {
+
+        $id = $request->input('number');
+        $re = reserve::find($id);
+
+
+        $re->name = $request->get('name');
+        $re->prenom = $request->input('prenom');
+        $re->email = $request->input('email');
+        $re->Age = $request->input('Age');
+//        $re->telephone = $request->input('telephone');
+        $re->nombre = $request->input('nombre');
+
+        $re->save();
+
+        return redirect()->back();
+
+    }
+
+
+    public function dropCor(Request $request)
+    {
+
+        $eventId = $request->request->get('eventId');
+        $res = reserve::find($eventId);
+
+
+        $start = $request->request->get('start');
+        $fin = $request->request->get('fin');
+        $star1 = $request->request->get('starDate1');
+        $star2 = $request->request->get('starDate2');
+
+        $end1 = $request->request->get('endDate1');
+        $end2 = $request->request->get('endDate2');
+
+
+        $res->date_deb =$start;
+        $res->date_fin =$fin;
+        $res->date_d =$star1;
+        $res->heure_d =$star2;
+        $res->date_f =$end1;
+        $res->heure_f =$end2;
+
+        $res->save();
+
+        return redirect()->back();
+
+    }
+
+
+
+//    public function show()
+//    {
+//
+//
+//
+////        return true;
+////        dd('eeee');
+//        return Response::json(true);
+//
+////        $data= reserve::Find($id);
+//
+////        $data = reserve::all();
+
+
+//        $resId = reserve::find($id);
+//
+//        $rese = reserve::select('name', 'prenom', 'email', 'Age', 'telephone', 'nombre', 'verifie', 'Type_etage', 'date_deb', 'date_fin', 'date_d', 'heure_d', 'date_f', 'heure_f')->where('id',3)->get();
+//
+//        return Response::json($rese);
+//
+
+//        return view('reserver', compact('data'));
+
+//        return View('reserver')->with(array('reservtions' => reserve::all()));
+//        return View('reserver',compact(reserve::all()));
+
+
+//        return View("reserver")->with($data);
+
 
 }
 

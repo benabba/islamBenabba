@@ -18,27 +18,30 @@ Route::get('/', function () {
 Auth::routes();
 
 
-
-
-
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/reservation','HomeController@reservation');
+Route::get('/reservation', 'HomeController@reservation');
 
 
-Route::post('/Envoi','resrvationController@sendEmailReminder');
-Route::post('/save','resrvationController@store');
-
+Route::post('/Envoi', 'resrvationController@sendEmailReminder');
+Route::post('/save', 'resrvationController@store');
 
 
 //Route::any('(.*)', function ($req){dd($req);});
 //Route::post('', function (){ return 'erreur'; } );
 
-Route::get('/reservation','resrvationController@afficherT');
-Route::post('/delete/{id}','resrvationController@delete');
+Route::get('/reservation', 'resrvationController@afficherT');
+Route::post('/delete/{id}', 'resrvationController@delete');
+//Route::get('/show','resrvationController@show');
 
-//Route::post('/pdf_gene','resrvationController@FichierDyna');
 
-Route::post('/download','PdfController@PDFD');
+
+Route::post('/affich','resrvationController@getEventInformation');
+Route::post('/update','resrvationController@update_res');
+
+Route::post('/drop','resrvationController@dropCor');
+
+
+Route::post('/download', 'PdfController@PDFD');
 
 //Route::post('/download','resrvationController@PDF');
 

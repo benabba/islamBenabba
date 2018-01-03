@@ -170,6 +170,69 @@
 
 
 
+
+    <div id="fullCalModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span> <span
+                                class="sr-only">close</span></button>
+                    <h4 id="modalTitle" class="modal-title">Reservation Detaille</h4>
+                </div>
+                <div id="modalBody" class="modal-body">
+
+                    <form role="form" id="contact_form2" action="{{url('/update')}}" method="POST">
+                        {!! csrf_field() !!}
+
+
+
+                        {{--<input name="name" type="text" id="name" value=""/>--}}
+                        <label for="inputName">ID</label>
+                        <input name="number" type="text" id="number" class="form-control" value="" readonly/><br>
+
+
+                        <label for="inputName">Name</label>
+                        <input name="name" type="text" id="name" class="form-control" value=""/><br>
+
+                        <label for="inputName">Prenom</label>
+                        <input name="prenom" type="text" id="prenom" class="form-control" value=""/><br>
+
+                        <label for="inputName">Email</label>
+                        <input name="email" type="text" id="email" class="form-control" value=""/><br>
+
+
+                        <label for="inputName">Age</label>
+                        <input name="Age" type="text" id="Age" class="form-control" value=""/><br>
+
+                        {{--<label for="inputName">Tele</label>--}}
+                        {{--<input name="tele" type="text" id="telep" class="form-control" value="" /><br>--}}
+
+                        <label for="inputName">Nombre</label>
+                        <input name="nombre" type="text" id="nombre" class="form-control" value=""/><br>
+
+
+                        <label for="inputName">Date Debut</label>
+                        <input name="date" type="text" id="date" class="form-control" value="" readonly/><br>
+
+
+                        {{--<input type="submit" value="Submit">--}}
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary submitBtn"> Update</button>
+
+                            {{--<button class="btn btn-primary"><a id="eventUrl" target="_blank">Modifier</a></button>--}}
+                        </div>
+
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 
@@ -179,13 +242,22 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{--<script src="{{asset('js/jqueryui-ui.min.js')}}"></script>--}}
+    {{--<script src="{{asset('js/jquery.min.js')}}" type="text/javascript"></script>--}}
+    {{--<script src="http://code.jquery.com/jquery-1.4.2.min.js" type="text/javascript"></script>--}}
+    {{--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js" type="text/javascript"></script>--}}
+
+
     <script src="{{asset('js/jquery1.js')}}"></script>
     <script src="{{asset('js/boustrap.js')}}"></script>
 
     <script src="{{asset('js/demo.js')}}"></script>
     <script src="{{asset('js/fullcalendar.js')}}"></script>
 
+    <script src="{{asset('js/jquery-ui.min.js')}}"></script>
 
+
+    {{--<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>--}}
 
     <script>
 
@@ -307,6 +379,58 @@
         }
 
 
+        function getEventInformation(eventId) {
+
+            var token = '{{csrf_token()}}';
+
+
+            var formData = new FormData();
+            formData.append('_token', token);
+            formData.append('eventId', eventId);
+
+
+            $.ajax({
+                headers: {'X-CSRF-TOKEN': token},
+                type: "POST",
+                url: '{{url('/affich')}}',
+                dataType: 'json',
+                data: formData,
+                //traditional: true,
+                processData: false, contentType: false,
+                success: function (Reponse) {
+//                    jQuery('#fullCalModal').html(Reponse);
+
+                    //console.log(response->);
+//                    alert(Reponse.event.name);
+//                    console.log(Reponse.html);
+//                    $('#fullCalModal').modal('show');
+                    //$('#fullCalModal').modal('show')
+//                    console.log(Reponse.event.telephone);
+
+                    $('#number').val(Reponse.event.id);
+                    $("#name").val(Reponse.event.name);
+                    $("#prenom").val(Reponse.event.prenom);
+                    $("#email").val(Reponse.event.email);
+                    $("#Age").val(Reponse.event.Age);
+                    $("#tele").val(Reponse.event.telephone);
+                    $("#nombre").val(Reponse.event.nombre);
+                    $("#date").val(Reponse.event.date_deb);
+
+
+                    $('#fullCalModal').modal('show');
+
+                },
+
+
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+
+
+        }
+
+
         $(document).ready(function () {
 
             var date = new Date();
@@ -329,9 +453,12 @@
 
                 // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
                 // it doesn't need to have a start or end
+
+
                 var eventObject = {
                     title: $.trim($(this).text()) // use the element's text as the event title
                 };
+
 
                 // store the Event Object in the DOM element so we can get to it later
                 $(this).data('eventObject', eventObject);
@@ -349,6 +476,7 @@
 
             /* initialize the calendar
              -----------------------------------------------------------------*/
+
 
             var calendar = $('#calendar').fullCalendar
             ({
@@ -376,6 +504,7 @@
                 },
                 allDaySlot: false,
                 selectHelper: true,
+                eventLimit: true,
 
 
                 select: function (start, end, allDay) {
@@ -386,47 +515,157 @@
                     if (!allDay) {
                         $('#myModal').modal('show');
 
+
                     } else {
                         $('#myModal2').modal('show');
 
                     }
 
-                    /*
-                     if (title) {
-                     calendar.fullCalendar('renderEvent',
-                     {
-                     title: title,
-                     start: start,
-                     end: end,
-                     allDay: allDay
-                     },
-                     true // make the event "stick"
-                     );
-                     }
-                     calendar.fullCalendar('unselect');
-                     */
+//
+//                         if (name) {
+//                         calendar.fullCalendar('renderEvent',
+//                         {
+//                         //title: title,
+//                         start: start,
+//                         end: end,
+//                         allDay: allDay
+//                         },
+//                         true // make the event "stick"
+//                         );
+//                         }
+//                         calendar.fullCalendar('unselect');
+
 
                 },
 
 
                 droppable: true, // this allows things to be dropped onto the calendar !!!
 
+                eventDrop: function (event, delta, revertFunc, jsEvent, ui, view) {
+
+
+                    var eventId = event.id;
+                    var a = event.start;
+                    var b = event.end;
+                    var g = new Date(a);
+
+
+                    g.setMinutes(a.getMinutes()+30);
+
+
+
+                    var token = '{{csrf_token()}}';
+
+
+                    f = a.toISOString().slice(0, 19).replace('T', ' ');
+                    s=g.toISOString().slice(0, 19).replace('T', ' ');
+
+
+
+
+                    newstardat = f.split(' ');
+                    newenddat = s.split(' ');
+
+
+//
+//                    if (g = null) {
+//                        console.log('ddddd');
+//
+//                    } else {
+//                        formData.append('fin', g);
+//                        formData.append('endDate2', newenddat[1]);
+//                    }
+
+
+                    var formData = new FormData();
+
+                    formData.append('_token', token);
+                    formData.append('eventId', eventId);
+                    formData.append('start', f);
+                    formData.append('fin', s);
+                    formData.append('starDate1', newstardat[0]);
+                    formData.append('starDate2', newstardat[1]);
+                    formData.append('endDate1', newenddat[0]);
+                    formData.append('endDate2', newenddat[1]);
+
+//
+//                    console.log(newstardat[0]);
+//                    console.log(newstardat[1]);
+//                    console.log(newenddat[0]);
+//                    console.log(newenddat[1]);
+//                    console.log(f);
+//                    console.log(s);
+
+
+
+
+                    $.ajax({
+                        headers: {'X-CSRF-TOKEN': token},
+                        type: "POST",
+                        url: '{{url('/drop')}}',
+                        dataType: 'json',
+                        data: formData,
+                        //traditional: true,
+                        processData: false, contentType: false,
+                        success: function (Reponse) {
+                            console.log('welldone');
+//                            revertFunc();
+
+                        },
+                        error: function (error) {
+                            console.log('raha_m9awda');
+//                            console.log(error);
+//                            revertFunc();
+
+                        }
+                    });
+
+
+                },
+
+//                    $.ajax({
+//                        url: '/hopital/doctor/ajaxCalenderUpdateEvent',
+//                        data: 'type=resetdate&title=' + title + '&start=' + start + '&end=' + end + '&eventid=' + id,
+//                        type: 'POST',
+//                        dataType: 'json',
+//                        success: function (response) {
+//                            if (response.status != 'success')
+//                                revertFunc();
+//                        },
+//                        error: function (e) {
+//                            revertFunc();
+////                            swal("Cancelled", "Your Event can't be moveble", "error");
+//                        }
+//                    });
+//                },
+
 
                 drop: function (date, allDay) { // this function is called when something is dropped
+
+
+//                    if (!allDay) {
+//
+//                    } else {
+//
+//                    }
 
                     // retrieve the dropped element's stored Event Object
                     var originalEventObject = $(this).data('eventObject');
 
                     // we need to copy it, so that multiple events don't have a reference to the same object
                     var copiedEventObject = $.extend({}, originalEventObject);
+//                    console.log(copiedEventObject);
 
                     // assign it the date that was reported
                     copiedEventObject.start = date;
                     copiedEventObject.allDay = allDay;
 
+                    console.log(copiedEventObject.start);
+
                     // render the event on the calendar
                     // the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
                     $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
+
 
                     // is the "remove after drop" checkbox checked?
                     if ($('#drop-remove').is(':checked')) {
@@ -437,23 +676,44 @@
                 },
 
 
+//                eventMouseover: function (event, jsEvent, view) {
+//                    //alert(JSON.stringify(item[0].id));
+//
+//                    /*var item = $(event);
+//                     var apptid = item[0].id;
+//                     var appttitle = item[0].title;
+//                     var apptstart = item[0].start;
+//                     var apptend = item[0].end;
+//                     var apptallDay = item[0].allDay;
+//                     var ti = $(this);
+//                     */
+//
+//                },
+//
+
                 events: [
 
                         @foreach($reservations as $reservation)
                     {
 
+                        id: '{{$reservation->id}}',
                         title: '{{$reservation->name}}',
                         start: '{{$reservation->date_deb}}',
                         allDay: false,
                         className: 'success'
                     },
                     @endforeach
+                ],
 
-                ]
+
+                eventClick: function (calEvent, jsEvent, view) {
+                    getEventInformation(calEvent.id);
+                }
 
 
             });
         });
+
 
     </script>
 @endsection

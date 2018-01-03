@@ -97,7 +97,7 @@
             <h1>Laser Game </h1>
 
             @endauth
-            
+
     </div>
 </div>
 </body>
